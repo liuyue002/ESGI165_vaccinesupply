@@ -11,12 +11,12 @@ beta=[1.6,0,0;
 %xi=[0.00;0.0;0.0];
 N=[6;3.6;3];
 %xi=[0.0;0.0028;0.0033]; %constaint: sum(xi)*N=0.02
-xi=[0.04;0.0;0.0]./N;
+xi=@(t)[0;0;0];
 % S: X(1:M), I: X(M+1:2*M), R: X(2*M+1:3*M), V: X(3*M+1:4*M)
-odefun=@(t,X)[-beta*X(M+1:2*M).*X(1:M)./N - xi.*X(1:M) ; 
-               beta*X(M+1:2*M).*X(1:M)./N - gamma*X(M+1:2*M) ;
-               gamma*X(M+1:2*M)  ;
-               xi.*X(1:M)];
+odefun=@(t,X)[-beta*X(M+1:2*M).*X(1:M)./N - xi(t).*X(1:M)./(N-X(3*M+1:4*M)) ; 
+               beta*X(M+1:2*M).*X(1:M)./N - gamma*X(M+1:2*M) - xi(t).*X(M+1:2*M)./(N-X(3*M+1:4*M)) ;
+               gamma*X(M+1:2*M) - xi(t).*X(2*M+1:3*M)./(N-X(3*M+1:4*M)) ;
+               xi(t)];
            
 tspan=[0,200];
 Sinit=[0.9; 1; 1].*N;
