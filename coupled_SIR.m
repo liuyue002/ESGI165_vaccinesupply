@@ -1,11 +1,11 @@
 
 M=3; % number of countries
 gamma=1/14;
-%beta=(eye(M)*1.6 + 0.03)*gamma;
-% beta=[1.6,0,0;
-%       0.03,1.6,0;
-%       0.03,0,1.6]*gamma;
-%beta=(eye(M)*1.6 + 0.03*2*rand(M))*gamma;
+beta=(eye(M)*1.6 + 0.03)*gamma;
+beta=[1.6,0,0;
+      0.03,1.6,0;
+      0.03,0,1.6]*gamma;
+% beta=(eye(M)*1.6 + 0.03*2*rand(M))*gamma;
 
 %%
 %xi=[0.00;0.0;0.0];
@@ -13,12 +13,10 @@ N=[6;3.6;3];
 %xi=[0.0;0.0028;0.0033]; %constaint: sum(xi)*N=0.02
 xi=@(t) [0.01;0.01;0.01];
 % S: X(1:M), I: X(M+1:2*M), R: X(2*M+1:3*M), V: X(3*M+1:4*M)
-odefun=@(t,X)[-beta*X(M+1:2*M).*X(1:M)./N - xi(t).*X(1:M)./(N-X(3*M+1:4*M)) ; 
-               beta*X(M+1:2*M).*X(1:M)./N - gamma*X(M+1:2*M) - xi(t).*X(M+1:2*M)./(N-X(3*M+1:4*M)) ;
-               gamma*X(M+1:2*M) - xi(t).*X(2*M+1:3*M)./(N-X(3*M+1:4*M)) ;
-               xi(t)];
-           
-tspan=[0,500];
+
+
+tmax = 700;
+tspan=[0,tmax];
 Sinit=[0.9; 1; 1].*N;
 Iinit=[0.1; 0; 0].*N;
 Rinit=[0;0;0].*N;
@@ -27,8 +25,51 @@ init=[Sinit;Iinit;Rinit;Vinit];
 
 options = odeset('RelTol',1e-12,'AbsTol',1e-13,'Events',@(t,X) event_negative(t,X,M));
 
-[t,X]=ode45(odefun,tspan,init,options);
-
+IsItEnd = 0;
+t = [];
+X = [];
+while IsItEnd == 0
+    % Run the ODE solver
+    [tt,XX,te,ye,ie]=ode45(@(tt,XX) odefun_SRI(tt, XX, xi, M, N, beta, gamma),tspan,init,options);
+    
+    % Determine why the solver halted
+    if isempty(ie) % Run out of time
+        
+        t = [t; tt];
+        X = [X; XX];
+        IsItEnd = 1;
+    else % One of Susceptible populations reached 0
+        for m = ie % Cancel all transmitions and vaccinations in that population
+            
+            t = [t; tt];
+            X = [X; XX];
+            
+            beta(:,m) = zeros(M,1);
+            beta(m,:) = zeros(1,M);
+            
+            % Redefine function xi
+            mmultip = ones(M,1);
+            mmultip(m) = 0;
+            xi = @(t) mmultip.*xi(t);
+            
+            % Redefine ODE problem
+            tspan = [t(end), tmax];
+            Sinit = X(end,1:M);
+            Iinit = X(end,M+1:2*M);
+            Rinit = X(end,2*M+1:3*M);
+            Vinit = X(end,3*M+1:4*M);
+            
+            clear tt XX
+            % Ensure no more susceptibles or recovered can be found
+            Sinit(m) = 0;
+            Rinit(m) = 0;
+            Iinit(m) = 0;
+            
+            init=[Sinit,Iinit,Rinit,Vinit];
+            
+        end
+    end
+end
 %%
 fig=figure('Position',[121 346 1734 439]);
 sfig1=subplot(1,3,1);
