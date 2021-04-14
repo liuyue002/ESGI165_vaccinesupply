@@ -1,4 +1,4 @@
-function [C,I] = cost_SIR(xi, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax)
+function [C,Itotal] = cost_SIR(xi, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k)
    
            
     % Generate function xi -- change as needed!
@@ -56,6 +56,11 @@ function [C,I] = cost_SIR(xi, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tma
         end
     end
     
-    I = trapz(t,X(:,M+1:2*M));
-    C = sum(I);
+    % death rate, k=hospital capacity, m=additional penalty past k
+    drate=@(I,k)(m1*I + (m2-m1)*(I>k) );
+    Itotal=zeros(M,1);
+    for i=1:M
+        Itotal(i)=trapz(t,drate(X(:,M+i),k(i)));
+    end
+    C = sum(Itotal);
 end

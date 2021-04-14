@@ -22,7 +22,10 @@ tmax = 200;
 
 K = sum(N)/200; % Total number of vaccines
 
-C1 = @(xi) cost_SIR(xi, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax);
+k=0.05*N;
+m1=1;
+m2=2;
+C1 = @(xi) cost_SIR(xi, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k);
 
 Aeq = ones(1,M);
 
@@ -37,6 +40,6 @@ options = optimoptions('fmincon');
 
 
 options.Display = 'off';
-options.UseParallel = true;
+options.UseParallel = false;
 
 [x,fval, exitflag] = fmincon(C1,xi0,A,b,Aeq,K, lb, b, b, options);
