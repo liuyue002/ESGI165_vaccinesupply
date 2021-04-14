@@ -1,12 +1,12 @@
 
 M=3; % number of countries
 gamma=1/14;
-beta=(eye(M)*1.6 + 0.03)*gamma;
-beta=[1.6,0,0;
-      0.03,1.6,0;
-      0.03,0,1.6]*gamma;
-% beta=(eye(M)*1.6 + 0.03*2*rand(M))*gamma;
-
+%beta=(eye(M)*1.6 + 0.03)*gamma;
+% beta=[1.6,0,0;
+%       0.03,1.6,0;
+%       0.03,0,1.6]*gamma;
+beta=(eye(M)*1.6 + 0.03*2*rand(M))*gamma;
+beta1 = beta;
 %%
 %xi=[0.00;0.0;0.0];
 N=[6;3.6;3];
@@ -48,7 +48,7 @@ while IsItEnd == 0
             Rinit = X(end,2*M+1:3*M);
             Vinit = X(end,3*M+1:4*M);
         for m = ie % Cancel all transmitions and vaccinations in that population
-            
+            m
             
             
             beta(:,m) = zeros(M,1);
