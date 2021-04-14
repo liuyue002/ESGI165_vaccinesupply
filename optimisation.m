@@ -25,15 +25,21 @@ K = sum(N)/200; % Total number of vaccines
 k=0.05*N;
 m1=1;
 m2=2;
-C1 = @(xi) cost_SIR(xi, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k);
+C1 = @(xi_params) cost_SIR(xi_params, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k,0);
 
-Aeq = ones(1,M);
+Aeq = zeros(3,M*3);
+for i=1:3
+    Aeq(i,(i-1)*M+1:i*M)=1;
+end
 
-xi0 = (ones(M,1)+10^(-2)*randn(M,1));
-xi0 = K/(sum(xi0)) * xi0;
+% assume there are 3 time ranges, cutoff at t1, t2
+num_timerange=3;
+xi0 = (ones(M,num_timerange)+10^(-2)*randn(M,num_timerange));
+xi0 = (K./sum(xi0,1)).*xi0;
+xi0 = reshape(xi0,M*3,1);
 
 A=[]; b=[]; 
-lb=zeros(M,1);
+lb=zeros(M*num_timerange,1);
 
 
 options = optimoptions('fmincon');
@@ -42,4 +48,8 @@ options = optimoptions('fmincon');
 options.Display = 'off';
 options.UseParallel = false;
 
-[x,fval, exitflag] = fmincon(C1,xi0,A,b,Aeq,K, lb, b, b, options);
+[x,fval, exitflag] = fmincon(C1,xi0,A,b,Aeq,ones(num_timerange,1)*K, lb, b, b, options);
+
+%%
+optimal_xi=x;
+cost_SIR(optimal_xi, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k,1);
