@@ -71,57 +71,26 @@ C = sum(Itotal);
 
 if make_plot
     fig=figure('Position',[121 346 1734 439]);
-    sfig1=subplot(1,3,1);
-    hold on
-    plot(t,X(:,1)./N(1));
-    plot(t,X(:,4)./N(1));
-    plot(t,X(:,7)./N(1));
-    plot(t,X(:,10)./N(1));
-    boundaryline=xline(t1);
-    boundaryline.Alpha=0.3;
-    boundaryline=xline(t2);
-    boundaryline.Alpha=0.3;
-    xlabel('t');
-    axis([0 tmax 0 1]);
-    legend('S1','I1','R1','V1');
-    intI=trapz(t,X(:,4));
-    fprintf('integral of I1: %.3f\n', intI);
-    title(['country 1, intI=',num2str(intI,'%.3f')]);
-    
-    sfig2=subplot(1,3,2);
-    hold on
-    plot(t,X(:,2)./N(2));
-    plot(t,X(:,5)./N(2));
-    plot(t,X(:,8)./N(2));
-    plot(t,X(:,11)./N(2));
-    boundaryline=xline(t1);
-    boundaryline.Alpha=0.3;
-    boundaryline=xline(t2);
-    boundaryline.Alpha=0.3;
-    xlabel('t');
-    axis([0 tmax 0 1]);
-    legend('S2','I2','R2','V2');
-    intI=trapz(t,X(:,5));
-    fprintf('integral of I2: %.3f\n', intI);
-    title(['country 2, intI=',num2str(intI,'%.3f')]);
-    
-    sfig3=subplot(1,3,3);
-    hold on
-    plot(t,X(:,3)./N(3));
-    plot(t,X(:,6)./N(3));
-    plot(t,X(:,9)./N(3));
-    plot(t,X(:,12)./N(3));
-    boundaryline=xline(t1);
-    boundaryline.Alpha=0.3;
-    boundaryline=xline(t2);
-    boundaryline.Alpha=0.3;
-    xlabel('t');
-    title('country 3');
-    axis([0 tmax 0 1]);
-    legend('S3','I3','R3','V3');
-    intI=trapz(t,X(:,6));
-    fprintf('integral of I3: %.3f\n', intI);
-    title(['country 3, intI=',num2str(intI,'%.3f')]);
+    for i=1:M
+        subplot(1,M,i);
+        hold on
+        plot(t,X(:,i)./N(i));
+        plot(t,X(:,M+i)./N(i));
+        plot(t,X(:,2*M+i)./N(i));
+        plot(t,X(:,3*M+i)./N(i));
+        boundaryline=xline(t1);
+        boundaryline.Alpha=0.3;
+        boundaryline=xline(t2);
+        boundaryline.Alpha=0.3;
+        horizline=yline(k(i)/N(i));
+        horizline.Alpha=0.3;
+        xlabel('t');
+        axis([0 tmax 0 1]);
+        legend('S','I','R','V');
+        %fprintf('integral of I1: %.3f\n', Itotal(1));
+        title(['country ',num2str(i),', Itotal=',num2str(Itotal(i),'%.3f')]);
+        hold off
+    end
 end
 
 end
