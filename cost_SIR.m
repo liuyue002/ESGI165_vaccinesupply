@@ -9,7 +9,10 @@ function [C,costpercountry] = cost_SIR(xi_params, M, beta, gamma, N, Sinit, Iini
 %t2=100;
 %xi_params = reshape(xi_params,M,3);
 %xi = @(t) xi_params(:,1) + heaviside(t-t1)*(xi_params(:,2)-xi_params(:,1)) + heaviside(t-t2)*(xi_params(:,3)-xi_params(:,2));
-xi=@(t) xi_params;
+
+%xi_params(3) is the amount that country 2 is given to country 1 for free
+%country 2 always produce maximum amount 0.1
+xi=@(t) [xi_params(1)+xi_params(3);xi_params(2)-xi_params(3)];
 xi_original = xi;
 
 tspan=[0,tmax];
@@ -36,6 +39,9 @@ while IsItEnd == 0
         t = [t; tt];
         X = [X; XX];
         tspan = [t(end), tmax];
+        if t(end)>=tmax
+            IsItEnd = 1;
+        end
         Sinit = X(end,1:M);
         Iinit = X(end,M+1:2*M);
         Rinit = X(end,2*M+1:3*M);
@@ -72,7 +78,7 @@ for i=1:M
     Itotal(i)=trapz(t,drate(X(:,M+i),k(i)));
 end
 %vaccinecost=costpervaccine.*(X(end,3*M+1:4*M)');
-vaccinecost=costpervaccine.*xi_params;
+vaccinecost=costpervaccine.*[xi_params(1);xi_params(2)];
 %productioncost=zeros(M,1);
 
 costpercountry=Itotal+vaccinecost;
