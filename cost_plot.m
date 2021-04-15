@@ -47,24 +47,44 @@ fig=figure;
 
 subplot(1,3,1);
 surf(Xi1,Xi2,cost);
+view(40,20);
+hold on
+[M1,I1]=min(cost,[],1);
+[M2,I2]=min(M1);
+plot3(Xi1(I1(I2),I2),Xi2(I1(I2),I2),cost(I1(I2),I2)+0.1,'.r','MarkerSize',15);
 xlabel('\xi_1');
 ylabel('\xi_2');
 zlabel('cost');
 title('total cost');
+hold off
 
 subplot(1,3,2);
 surf(Xi1,Xi2,cost1);
+view(40,20);
+hold on
+[M1,I1]=min(cost1,[],2);
+for i=1:numpts
+    plot3(Xi1(i,I1(i)),Xi2(i,I1(i)),cost1(i,I1(i))+0.1,'.r','MarkerSize',15);
+end
 xlabel('\xi_1');
 ylabel('\xi_2');
 zlabel('cost');
 title('cost of country 1');
+hold off
 
 subplot(1,3,3);
 surf(Xi1,Xi2,cost2);
+hold on
+[M1,I1]=min(cost2,[],1);
+for i=1:numpts
+    plot3(Xi1(I1(i),i),Xi2(I1(i),i),cost2(I1(i),i)+0.1,'.r','MarkerSize',15);
+end
+view(40,20);
 xlabel('\xi_1');
 ylabel('\xi_2');
 zlabel('cost');
 title('cost of country 2');
+hold off
 
 %%
 
