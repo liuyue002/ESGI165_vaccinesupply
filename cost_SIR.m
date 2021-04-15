@@ -1,14 +1,15 @@
-function [C,Itotal] = cost_SIR(xi_params, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k,costpervaccine,make_plot)
+function [C,costpercountry] = cost_SIR(xi_params, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k,costpervaccine,make_plot)
 
 
 % Generate function xi -- change as needed!
 
 % assume xi is piecewise constant, with 3 pieces, cutoff at t1, t2
 % column 1 of xi_params are the xi's for the first time range, and so on
-t1=50;
-t2=100;
-xi_params = reshape(xi_params,M,3);
-xi = @(t) xi_params(:,1) + heaviside(t-t1)*(xi_params(:,2)-xi_params(:,1)) + heaviside(t-t2)*(xi_params(:,3)-xi_params(:,2));
+%t1=50;
+%t2=100;
+%xi_params = reshape(xi_params,M,3);
+%xi = @(t) xi_params(:,1) + heaviside(t-t1)*(xi_params(:,2)-xi_params(:,1)) + heaviside(t-t2)*(xi_params(:,3)-xi_params(:,2));
+xi=@(t) xi_params;
 xi_original = xi;
 
 tspan=[0,tmax];
@@ -39,7 +40,7 @@ while IsItEnd == 0
         Iinit = X(end,M+1:2*M);
         Rinit = X(end,2*M+1:3*M);
         Vinit = X(end,3*M+1:4*M);
-        for m = ie % Cancel all transmitions and vaccinations in that population
+        for m = ie' % Cancel all transmitions and vaccinations in that population
             tHalt(m) = tt(end);
             tHaltIndex(m) = size(t,1);
             beta(:,m) = zeros(M,1);
@@ -71,8 +72,11 @@ for i=1:M
     Itotal(i)=trapz(t,drate(X(:,M+i),k(i)));
 end
 vaccinecost=costpervaccine.*(X(end,3*M+1:4*M)');
+%productioncost=zeros(M,1);
 
-C = sum(Itotal)+sum(vaccinecost);
+costpercountry=Itotal+vaccinecost;
+
+C = sum(costpercountry);
 
 if make_plot
     fig=figure('Position',[121 346 1734 439]);
@@ -83,10 +87,10 @@ if make_plot
         plot(t,X(:,M+i)./N(i));
         plot(t,X(:,2*M+i)./N(i));
         plot(t,X(:,3*M+i)./N(i));
-        boundaryline=xline(t1);
-        boundaryline.Alpha=0.3;
-        boundaryline=xline(t2);
-        boundaryline.Alpha=0.3;
+%         boundaryline=xline(t1);
+%         boundaryline.Alpha=0.3;
+%         boundaryline=xline(t2);
+%         boundaryline.Alpha=0.3;
         horizline=yline(k(i)/N(i));
         horizline.Alpha=0.3;
         xlabel('t');

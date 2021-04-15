@@ -35,7 +35,8 @@ end
 
 % assume there are 3 time ranges, cutoff at t1, t2
 num_timerange=3;
-xi0 = (ones(M,num_timerange)+10^(-2)*randn(M,num_timerange));
+%xi0 = (ones(M,num_timerange)+10^(-2)*randn(M,num_timerange));
+xi0 = rand(M,num_timerange);
 xi0 = (K./sum(xi0,1)).*xi0;
 xi0 = reshape(xi0,M*3,1);
 
