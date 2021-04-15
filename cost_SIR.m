@@ -71,7 +71,8 @@ Itotal=zeros(M,1);
 for i=1:M
     Itotal(i)=trapz(t,drate(X(:,M+i),k(i)));
 end
-vaccinecost=costpervaccine.*(X(end,3*M+1:4*M)');
+%vaccinecost=costpervaccine.*(X(end,3*M+1:4*M)');
+vaccinecost=costpervaccine.*xi_params;
 %productioncost=zeros(M,1);
 
 costpercountry=Itotal+vaccinecost;
