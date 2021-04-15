@@ -1,10 +1,10 @@
 M=3; % number of countries
 gamma=1/14;
 %beta=(eye(M)*1.6 + 0.03)*gamma;
-beta=[1.6,0,0;
-      0.03,1.6,0;
-      0.03,0,1.6]*gamma;
-% beta=(eye(M)*1.6 + 0.03*2*rand(M))*gamma;
+%beta=[1.6,0,0;
+%       0.03,1.6,0;
+%       0.03,0,1.6]*gamma;
+%  beta=(eye(M)*1.6 + 0.03*2*rand(M))*gamma;
 
 %%
 %xi=[0.00;0.0;0.0];
@@ -12,8 +12,8 @@ N=[6;3.6;3];
 %xi=[0.0;0.0028;0.0033]; %constaint: sum(xi)*N=0.02
 %xi=@(t) [0.01;0.01;0.01];
 
-Sinit=[0.9; 1; 1].*N;
-Iinit=[0.1; 0; 0].*N;
+Sinit=[0.8; 0.9; 1].*N;
+Iinit=[0.2; 0.1; 0].*N;
 Rinit=[0;0;0].*N;
 Vinit=[0;0;0].*N;
 
