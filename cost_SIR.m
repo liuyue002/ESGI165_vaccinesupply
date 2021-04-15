@@ -1,4 +1,4 @@
-function [C,Itotal] = cost_SIR(xi_params, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k,make_plot)
+function [C,Itotal] = cost_SIR(xi_params, M, beta, gamma, N, Sinit, Iinit, Rinit, Vinit, tmax,m1,m2,k,costpervaccine,make_plot)
 
 
 % Generate function xi -- change as needed!
@@ -9,6 +9,7 @@ t1=50;
 t2=100;
 xi_params = reshape(xi_params,M,3);
 xi = @(t) xi_params(:,1) + heaviside(t-t1)*(xi_params(:,2)-xi_params(:,1)) + heaviside(t-t2)*(xi_params(:,3)-xi_params(:,2));
+xi_original = xi;
 
 tspan=[0,tmax];
 init=[Sinit;Iinit;Rinit;Vinit];
@@ -19,6 +20,7 @@ IsItEnd = 0;
 t = [];
 X = [];
 tHalt = zeros(M,1);
+tHaltIndex = zeros(M,1);
 while IsItEnd == 0
     % Run the ODE solver
     [tt,XX,te,ye,ie]=ode45(@(tt,XX) odefun_SRI(tt, XX, xi, M, N, beta, gamma),tspan,init,options);
@@ -39,6 +41,7 @@ while IsItEnd == 0
         Vinit = X(end,3*M+1:4*M);
         for m = ie % Cancel all transmitions and vaccinations in that population
             tHalt(m) = tt(end);
+            tHaltIndex(m) = size(t,1);
             beta(:,m) = zeros(M,1);
             beta(m,:) = zeros(1,M);
             
@@ -67,7 +70,9 @@ Itotal=zeros(M,1);
 for i=1:M
     Itotal(i)=trapz(t,drate(X(:,M+i),k(i)));
 end
-C = sum(Itotal);
+vaccinecost=costpervaccine.*(X(end,3*M+1:4*M)');
+
+C = sum(Itotal)+sum(vaccinecost);
 
 if make_plot
     fig=figure('Position',[121 346 1734 439]);
@@ -88,7 +93,7 @@ if make_plot
         axis([0 tmax 0 1]);
         legend('S','I','R','V');
         %fprintf('integral of I1: %.3f\n', Itotal(1));
-        title(['country ',num2str(i),', Itotal=',num2str(Itotal(i),'%.3f')]);
+        title(['country ',num2str(i),', Itotal=',num2str(Itotal(i),'%.3f'),' ,vaccinecost=',num2str(vaccinecost(i))]);
         hold off
     end
 end
