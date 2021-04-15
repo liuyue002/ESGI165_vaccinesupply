@@ -48,8 +48,6 @@ while IsItEnd == 0
             Rinit = X(end,2*M+1:3*M);
             Vinit = X(end,3*M+1:4*M);
         for m = ie % Cancel all transmitions and vaccinations in that population
-            m
-            
             
             beta(:,m) = zeros(M,1);
             beta(m,:) = zeros(1,M);

@@ -32,6 +32,11 @@ while IsItEnd == 0
     else % One of Susceptible populations reached 0
         t = [t; tt];
         X = [X; XX];
+        tspan = [t(end), tmax];
+        Sinit = X(end,1:M);
+        Iinit = X(end,M+1:2*M);
+        Rinit = X(end,2*M+1:3*M);
+        Vinit = X(end,3*M+1:4*M);
         for m = ie % Cancel all transmitions and vaccinations in that population
             tHalt(m) = tt(end);
             beta(:,m) = zeros(M,1);
@@ -42,23 +47,17 @@ while IsItEnd == 0
             mmultip(m) = 0;
             xi = @(t) mmultip.*xi(t);
             
-            % Redefine ODE problem
-            tspan = [t(end), tmax];
-            Sinit = X(end,1:M);
-            Iinit = X(end,M+1:2*M);
-            Rinit = X(end,2*M+1:3*M);
-            Vinit = X(end,3*M+1:4*M);
-            
             
             % Ensure no more susceptibles or recovered can be found
             Sinit(m) = 0;
             Rinit(m) = 0;
             Iinit(m) = 0;
             
-            init=[Sinit,Iinit,Rinit,Vinit];
+           
             
         end
         clear tt XX
+        init=[Sinit,Iinit,Rinit,Vinit];
     end
 end
 
